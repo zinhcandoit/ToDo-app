@@ -22,7 +22,7 @@ class Token(BaseModel):
     user: Optional[Dict[str, Any]] = None
 
 class TokenData(BaseModel):
-    user_id: Optional[int] = None
+    email: Optional[str] = None
 
 class ChangePassword(BaseModel):
     old_password: str
