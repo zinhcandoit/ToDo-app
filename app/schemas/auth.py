@@ -6,7 +6,6 @@ class UserSignup(BaseModel):
     name: str
     email: EmailStr
     password: str
-    agreed_to_terms: bool = True
 
 class UserLogin(BaseModel):
     email: EmailStr

@@ -21,8 +21,7 @@ def signup(payload: UserSignup, db: Session = Depends(get_db)):
         name=display_name,
         email=payload.email,
         hashed_password=get_password_hash(payload.password),
-        is_active=True,
-        agreed_to_terms=payload.agreed_to_terms,
+        is_active=True
     )
     db.add(user)
     db.commit()

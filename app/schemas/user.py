@@ -8,7 +8,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    agreed_to_terms: bool = True
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
