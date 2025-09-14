@@ -42,7 +42,11 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     return token_data
 
 def get_current_user(db: Session = Depends(get_db), token_data: TokenData = Depends(verify_token)):
-    user = db.query(User).get(token_data.user_id)
+    user = db.query(User).filter(User.id == token_data.user_id).first()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return user

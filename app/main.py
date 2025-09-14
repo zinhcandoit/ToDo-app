@@ -13,7 +13,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Todo API")
 origins = [
     "http://localhost:5173",
-    "https://to-do-app-azure-tau.vercel.app/",
+    "https://to-do-app-azure-tau.vercel.app",
 ]
 app.add_middleware(
     CORSMiddleware,

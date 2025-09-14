@@ -7,40 +7,50 @@ from app.schemas.auth import UserSignup, UserLogin, Token
 from app.auth import get_password_hash, verify_password, create_access_token
 from app.config import settings
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(tags=["Auth"])
 
 @router.post("/signup", response_model=Token)
 def signup(payload: UserSignup, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    display_name = payload.username or payload.name
+    if not display_name:
+        raise HTTPException(status_code=400, detail="username (or name) is required")
+
     user = User(
-        name=payload.name,
+        name=display_name,              # CHỈNH Ở ĐÂY: dùng name
         email=payload.email,
         hashed_password=get_password_hash(payload.password),
         is_active=True,
     )
     db.add(user); db.commit(); db.refresh(user)
 
-    token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=timedelta(minutes=settings.access_token_expire_minutes)
-    )
-    return {"access_token": token, "token_type": "bearer",
-            "user": {"id": user.id, "name": user.name, "email": user.email}}
+    access_token = create_access_token(data={"sub": str(user.id)})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {"id": user.id, "name": user.name, "email": user.email},
+    }
 
 @router.post("/login", response_model=Token)
 def login(payload: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == payload.email).first()
+    user = None
+    if payload.email:
+        user = db.query(User).filter(User.email == payload.email).first()
+    elif payload.username:
+        # nếu muốn cho phép login bằng "username" thì coi "username" là name
+        user = db.query(User).filter(User.name == payload.username).first()
+
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=timedelta(minutes=settings.access_token_expire_minutes)
-    )
-    return {"access_token": token, "token_type": "bearer",
-            "user": {"id": user.id, "name": user.name, "email": user.email}}
+    token = create_access_token(data={"sub": str(user.id)})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {"id": user.id, "name": user.name, "email": user.email},
+    }
 
 @router.post("/forgot")
 def forgot(body: dict):
