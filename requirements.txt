@@ -14,3 +14,4 @@ passlib[bcrypt]==1.7.4   # password hashing
 pydantic==2.9.2
 python-dotenv==1.0.1     # load .env
 pydantic-settings
+email-validator
