@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -8,7 +9,6 @@ from app.config import settings
 from app.database import get_db
 from app.models.user import User
 from app.schemas.auth import TokenData
-from datetime import datetime, timedelta
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
@@ -33,16 +33,16 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     )
     try:
         payload = jwt.decode(credentials.credentials, settings.secret_key, algorithms=[settings.algorithm])
-        sub = payload.get("sub")
-        if sub is None:
+        email = payload.get("sub")
+        if email is None:
             raise cred_exc
-        token_data = TokenData(user_id=int(sub))
+        token_data = TokenData(email=email)
     except JWTError:
         raise cred_exc
     return token_data
 
 def get_current_user(db: Session = Depends(get_db), token_data: TokenData = Depends(verify_token)):
-    user = db.query(User).filter(User.id == token_data.user_id).first()
+    user = db.query(User).filter(User.email == token_data.email).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

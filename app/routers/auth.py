@@ -11,27 +11,29 @@ router = APIRouter(tags=["Auth"])
 
 @router.post("/signup", response_model=Token)
 def signup(payload: UserSignup, db: Session = Depends(get_db)):
+    # Email unique
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    display_name = payload.username or payload.name
-    if not display_name:
-        raise HTTPException(status_code=400, detail="username (or name) is required")
+    display_name = payload.name or payload.email.split("@")[0]
 
     user = User(
-        name=display_name,              # CHỈNH Ở ĐÂY: dùng name
+        name=display_name,
         email=payload.email,
         hashed_password=get_password_hash(payload.password),
         is_active=True,
+        agreed_to_terms=payload.agreed_to_terms,
     )
-    db.add(user); db.commit(); db.refresh(user)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
-    access_token = create_access_token(data={"sub": str(user.id)})
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": {"id": user.id, "name": user.name, "email": user.email},
-    }
+    token = create_access_token(
+        data={"sub": user.email},
+        expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+    )
+    return {"access_token": token, "token_type": "bearer",
+            "user": {"id": user.id, "name": user.name, "email": user.email}}
 
 @router.post("/login", response_model=Token)
 def login(payload: UserLogin, db: Session = Depends(get_db)):
