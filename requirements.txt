@@ -19,3 +19,4 @@ passlib[bcrypt]==1.7.4
 
 # .env loader cho pydantic-settings
 python-dotenv==1.0.1
+starlette.responses
