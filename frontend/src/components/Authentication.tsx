@@ -67,17 +67,18 @@ export default function Authentication({ open, onClose, auth = authClient }: Pro
         try {
             if (mode === "login") {
                 const res = await auth.login({ email, password: pw });
-                if (!res.ok) throw new Error(res.message || "Login failed");
                 tokenStore.set(res.token!);
                 notifyAuthChanged?.(res.token);
+                if (!res.ok) throw new Error(res.message || "Login failed");
                 toast.success(`Welcome back${res.user?.name ? `, ${res.user.name}` : ""}!`);
                 onClose();
                 resetForm();
             } else if (mode === "signup") {
                 const res = await auth.signup({ name, email, password: pw });
-                if (!res.ok) throw new Error(res.message || "Signup failed");
                 tokenStore.set(res.token!);
                 notifyAuthChanged?.(res.token);
+                if (!res.ok) throw new Error(res.message || "Signup failed");
+
                 toast.success("Account created. You can sign in now.");
                 // Chuyển về login cho mượt
                 setMode("login");
@@ -101,12 +102,13 @@ export default function Authentication({ open, onClose, auth = authClient }: Pro
         setLoading(true);
         try {
             const res = await auth.loginWithGoogle();
+            tokenStore.set(res.token!);
+            notifyAuthChanged?.(res.token);
             if (!res.ok) {
                 toast.error(res.message || "Google sign-in failed");
                 return;
             }
-            tokenStore.set(res.token!);
-            notifyAuthChanged?.(res.token); // nếu bạn có hàm này để reload tasks
+            // nếu bạn có hàm này để reload tasks
             toast.success(`Signed in with Google${res.user?.email ? `: ${res.user.email}` : ""}`);
             onClose();
             resetForm();
