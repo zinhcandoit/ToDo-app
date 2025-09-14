@@ -4,6 +4,7 @@ import { TaskList } from './features/tasks/components/TaskList'
 import { TaskEditModal } from './features/tasks/components/TaskEdit'
 import { FiltersBar, type FiltersState } from './features/tasks/components/FiltersBar'
 import { useTasks } from './features/tasks/state'
+import type { NewTaskInput } from './features/tasks/types'
 import { Toaster, useToast } from './components/Toast'
 import AuthOverlay from "./components/Authentication"
 import { toast } from "./lib/toast"
@@ -102,10 +103,15 @@ export default function App() {
     useTaskTitle(done, total)
     useTaskHotkeys(tasks, clearCompleted, pushToast)
 
-    const handleAdd = (input: any) => {
-        const t = addTask(input)
-        pushToast({ title: 'Task added', description: t.title })
-    }
+    // const handleAdd = (input: any) => {
+    //     const t = addTask(input)
+    //     pushToast({ title: 'Task added', description: t.title })
+    // }
+    const handleAdd = (input: NewTaskInput) => {
+        addTask(input).then((t) => {
+            pushToast({ title: 'Task added', description: t.title })
+        });
+    };
 
     const handleDelete = (task: any) => {
         const snapshot = [...tasks]
