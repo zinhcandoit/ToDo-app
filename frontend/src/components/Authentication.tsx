@@ -67,28 +67,35 @@ export default function Authentication({ open, onClose, auth = authClient }: Pro
         try {
             if (mode === "login") {
                 const res = await auth.login({ email, password: pw });
-                tokenStore.set(res.token!);
-                notifyAuthChanged?.(res.token);
                 if (!res.ok) throw new Error(res.message || "Login failed");
+
+                // chỉ set token sau khi OK
+                if (res.token) {
+                    tokenStore.set(res.token);
+                    notifyAuthChanged(res.token);
+                }
+
                 toast.success(`Welcome back${res.user?.name ? `, ${res.user.name}` : ""}!`);
                 onClose();
                 resetForm();
             } else if (mode === "signup") {
                 const res = await auth.signup({ name, email, password: pw });
-                tokenStore.set(res.token!);
-                notifyAuthChanged?.(res.token);
                 if (!res.ok) throw new Error(res.message || "Signup failed");
 
-                toast.success("Account created. You can sign in now.");
-                // Chuyển về login cho mượt
-                setMode("login");
-                setPw("");
-                setPw2("");
+                // Auto-sign-in sau khi signup (BE trả token)
+                if (res.token) {
+                    tokenStore.set(res.token);
+                    notifyAuthChanged(res.token);
+                }
+
+                toast.success("Account created. You're in!");
+                onClose();
+                resetForm();
+                setMode("login"); // giữ hay bỏ đều được; không ảnh hưởng vì overlay đã đóng
             } else {
                 const res = await auth.forgot({ email });
                 if (!res.ok) throw new Error(res.message || "Request failed");
                 toast.info(res.message || `Reset link sent to ${email}`);
-                // Ở lại màn hình forgot hay quay về login tùy bạn:
                 setMode("login");
             }
         } catch (err: any) {
@@ -102,13 +109,17 @@ export default function Authentication({ open, onClose, auth = authClient }: Pro
         setLoading(true);
         try {
             const res = await auth.loginWithGoogle();
-            tokenStore.set(res.token!);
-            notifyAuthChanged?.(res.token);
+
             if (!res.ok) {
-                toast.error(res.message || "Google sign-in failed");
-                return;
+                // Không set token, không notify nếu thất bại
+                throw new Error(res.message || "Google sign-in failed");
             }
-            // nếu bạn có hàm này để reload tasks
+
+            if (res.token) {
+                tokenStore.set(res.token);
+                notifyAuthChanged(res.token);
+            }
+
             toast.success(`Signed in with Google${res.user?.email ? `: ${res.user.email}` : ""}`);
             onClose();
             resetForm();
