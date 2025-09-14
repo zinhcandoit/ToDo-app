@@ -1,0 +1,15 @@
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Database
+SQLAlchemy==2.0.32
+psycopg2-binary==2.9.9   # driver PostgreSQL
+
+# Auth & Security
+python-jose==3.3.0       # JWT (sign/verify token)
+passlib[bcrypt]==1.7.4   # password hashing
+
+# Utils
+pydantic==2.9.2
+python-dotenv==1.0.1     # load .env
