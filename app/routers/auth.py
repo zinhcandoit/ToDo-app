@@ -29,7 +29,7 @@ def signup(payload: UserSignup, db: Session = Depends(get_db)):
 
     token = create_access_token(
         data={"sub": user.email},
-        expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     return {"access_token": token, "token_type": "bearer",
             "user": {"id": user.id, "name": user.name, "email": user.email}}
