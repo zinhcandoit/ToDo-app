@@ -14,8 +14,8 @@ email-validator==2.2.0
 python-jose==3.3.0
 passlib[bcrypt]==1.7.4
 
-# PostgreSQL driver (v3, tương thích Python 3.13)
-psycopg[binary]==3.2.1
+# # PostgreSQL driver (v3, tương thích Python 3.13)
+# psycopg[binary]==3.2.1
 
 # .env loader cho pydantic-settings
 python-dotenv==1.0.1
