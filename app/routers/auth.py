@@ -4,33 +4,68 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from app.schemas.auth import UserSignup, UserLogin, Token
-from app.schemas.user import UserResponse
-from app.core.auth import hash_password, verify_password, create_access_token, get_current_user
+from app.auth import get_password_hash, verify_password, create_access_token
+from datetime import timedelta
+from app.config import settings
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/signup", response_model=Token)
 def signup(payload: UserSignup, db: Session = Depends(get_db)):
+    # unique checks
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
-    user = User(name=payload.name, email=payload.email, hashed_password=hash_password(payload.password))
-    db.add(user); db.commit(); db.refresh(user)
-    token = create_access_token(sub=user.email)
-    return {"access_token": token, "user": UserResponse.model_validate(user).model_dump()}
+    if db.query(User).filter(User.username == payload.username).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    user = User(
+        username=payload.username,             # đã đảm bảo có
+        email=payload.email,
+        hashed_password=get_password_hash(payload.password),
+        agreed_to_terms=payload.agreed_to_terms,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    # token sub = username để tương thích get_current_user cũ
+    access_token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {"id": user.id, "name": user.username, "email": user.email},
+    }
 
 @router.post("/login", response_model=Token)
 def login(payload: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == payload.email).first()
+    if payload.email:
+        user = db.query(User).filter(User.email == payload.email).first()
+    else:
+        user = db.query(User).filter(User.username == payload.username).first()
+
     if not user or not verify_password(payload.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
-    token = create_access_token(sub=user.email)
-    return {"access_token": token, "user": UserResponse.model_validate(user).model_dump()}
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-@router.get("/me", response_model=UserResponse)
-def me(current_user: User = Depends(get_current_user)):
-    return current_user
+    token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+    )
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {"id": user.id, "name": user.username, "email": user.email},
+    }
 
+# (tuỳ chọn) Forgot password stub
 @router.post("/forgot")
-def forgot():
-    # mock cho UI
-    return {"message": "If that email exists, a reset link was sent."}
+def forgot(email: dict):
+    # chỉ trả stub cho FE mock
+    return {"message": f"Reset link sent to {email.get('email')}"}
+
+@router.post("/google/start")
+def google_start():
+    raise HTTPException(status_code=501, detail="Google OAuth not configured")
