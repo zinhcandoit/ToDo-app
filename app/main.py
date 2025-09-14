@@ -1,5 +1,5 @@
 # app/main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from app.config import settings
@@ -30,7 +30,9 @@ app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
 def health():
     return {"ok": True}
 
-@app.get("/", include_in_schema=False)
-async def root():
-    # return {"service": "todo-api", "status": "ok"}  # hoặc
-    return RedirectResponse("/docs")
+@app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
+async def root(req: Request):
+    if req.method == "HEAD":
+        # Health-check HEAD -> trả 200 OK
+        return Response(status_code=200)
+    return RedirectResponse("/docs", status_code=307)
