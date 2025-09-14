@@ -6,7 +6,7 @@ from datetime import datetime
 import uuid
 
 from app.database import get_db
-from app.core.auth import get_current_user
+from app.auth import get_current_user
 from app.models.user import User
 from app.models.task import Task
 from app.schemas.task import TaskCreate, TaskPatch, TaskResponse
