@@ -8,7 +8,7 @@ export type AuthResult = {
 export type LoginInput = { email: string; password: string };
 export type SignupInput = { name: string; email: string; password: string };
 
-const base = import.meta.env.VITE_API_BASE as string;
+const base = ((import.meta.env.VITE_API_BASE as string) || "").replace(/\/+$/, "");
 
 export interface AuthClient {
     login(input: LoginInput): Promise<AuthResult>;
