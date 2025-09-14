@@ -10,10 +10,13 @@ from app.routers import tasks as tasks_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Todo API")
-
+origins = [
+    "http://localhost:5173",
+    "https://to-do-app-azure-tau.vercel.app/",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_list if settings.cors_list != ["*"] else ["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

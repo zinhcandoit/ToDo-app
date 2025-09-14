@@ -107,10 +107,13 @@ export default function App() {
     //     const t = addTask(input)
     //     pushToast({ title: 'Task added', description: t.title })
     // }
-    const handleAdd = (input: NewTaskInput) => {
-        addTask(input).then((t) => {
-            pushToast({ title: 'Task added', description: t.title })
-        });
+    const handleAdd = async (input: NewTaskInput) => {
+        try {
+            const t = await addTask(input);             // ⬅️ PHẢI await
+            pushToast({ title: 'Task added', description: t.title });
+        } catch (e: any) {
+            toast.error(e?.message ?? 'Failed to add task');
+        }
     };
 
     const handleDelete = (task: any) => {

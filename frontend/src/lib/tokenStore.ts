@@ -1,13 +1,10 @@
-const STORAGE_KEY = "auth.token";
-
+const KEY = 'auth.token';
 export const tokenStore = {
-    set(token: string) {
-        localStorage.setItem(STORAGE_KEY, token);
+    get: () => localStorage.getItem(KEY),
+    set: (t: string) => localStorage.setItem(KEY, t),
+    clear: () => localStorage.removeItem(KEY),
+    getAuthHeader: () => {
+        const t = localStorage.getItem(KEY);
+        return t ? `Bearer ${t}` : null;
     },
-    get(): string | null {
-        return localStorage.getItem(STORAGE_KEY);
-    },
-    clear() {
-        localStorage.removeItem(STORAGE_KEY);
-    }
 };
