@@ -1,0 +1,31 @@
+/* App background + theme tokens */
+:root {
+  --bg: 255 255 255;
+  --fg: 17 24 39;
+}
+
+.dark {
+  --bg: 17 24 39;
+  --fg: 243 244 246;
+}
+
+html,
+body,
+#root {
+  height: 100%
+}
+
+body {
+  background: linear-gradient(180deg, #e1e5e9, transparent) rgb(var(--bg));
+  color: rgb(var(--fg));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container-prose {
+  @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.kb-focus:focus-visible {
+  @apply outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
+}

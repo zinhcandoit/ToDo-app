@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title> Get It Done!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Legacy fallback: mọi browser đều sẽ tìm favicon.ico -->
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <!-- Modern browsers: ưu tiên SVG -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- PNG fallback (Chrome/Safari/Android/iOS thích hợp size cụ thể) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+  <!-- iOS home screen -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- PWA manifest (nếu bạn dùng) -->
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Safari pinned tab (tùy chọn, nếu bạn có icon .svg đơn sắc) -->
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0ea5e9" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {} },
+    }
+  </script>
+</head>
+
+
+<body>
+  <div class="fixed top-2 left-2 flex items-center z-50" style="background-color: black;">
+    <!-- Logo 1 -->
+    <img src="/src/assets/hackathon-graphic.svg" alt="Logo 1" class="h-20 w-20" />
+    <!-- Logo 2 -->
+    <img src="/src/assets/naver-logo.svg" alt="Logo 2" />
+  </div>
+  <div id="theme-toggle"></div>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+  <script src="/ThemeToggle.js"></script>
+  <script>
+    // Khởi tạo nút toggle và theme
+    window.ThemeToggler.init({ targetId: 'theme-toggle' });
+
+    // Bridge cho Tailwind (darkMode: 'class'): thêm/bỏ class "dark" trên <html>
+    const applyDarkClass = (theme) =>
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    applyDarkClass(window.ThemeToggler.getTheme());
+    window.addEventListener('themeChange', (e) => applyDarkClass(e.detail.theme));
+  </script>
+</body>
+
+</html>
