@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 from app.config import settings
 
-DB_URL = settings.sqlalchemy_database_url
+DB_URL = settings.DATABASE_URL
 connect_args = {"check_same_thread": False} if DB_URL.startswith("sqlite") else {}
 
 engine = create_engine(DB_URL, connect_args=connect_args, future=True)
