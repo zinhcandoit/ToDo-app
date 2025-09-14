@@ -21,7 +21,7 @@ export function TaskList({ tasks, onToggle, onDelete, onEdit }: Props) {
             </div>
         )
     }
-    const [focusedIndex, setFocusedIndex] = useState(-1);
+    const [focusedIndex] = useState(-1);
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     //Overdue Task
     const sorted = [...tasks].sort((a, b) => {

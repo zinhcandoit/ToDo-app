@@ -1,5 +1,3 @@
-import React from 'react';
-
 export type ViewKey = 'list' | 'calendar' | 'analytics' | 'caring';
 
 export function ViewTabs({ value, onChange }: {
