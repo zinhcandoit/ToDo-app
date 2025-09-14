@@ -8,3 +8,5 @@ export const tokenStore = {
         return t ? `Bearer ${t}` : null;
     },
 };
+export const notifyAuthChanged = (token?: string) =>
+    window.dispatchEvent(new CustomEvent('auth:changed', { detail: { token } }));

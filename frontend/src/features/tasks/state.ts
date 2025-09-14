@@ -122,9 +122,14 @@ export function useTasks() {
     // ---- real mode: load from BE on mount ----
     useEffect(() => {
         if (!isMock) {
-            tasksClient.list().then(tasks => dispatch({ type: "replace", tasks }))
+            const fetchTasks = () =>
+                tasksClient.list().then(ts => dispatch({ type: 'replace', tasks: ts })).catch(() => { });
+            fetchTasks();
+            const h = () => fetchTasks();
+            window.addEventListener('auth:changed', h);
+            return () => window.removeEventListener('auth:changed', h);
         }
-    }, [isMock])
+    }, [isMock]);
 
     return {
         tasks: state,
