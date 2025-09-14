@@ -2,16 +2,20 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 
-# Database
+# Database / ORM
 SQLAlchemy==2.0.32
-psycopg[binary]>=3.2   # driver PostgreSQL
 
-# Auth & Security
-python-jose==3.3.0       # JWT (sign/verify token)
-passlib[bcrypt]==1.7.4   # password hashing
-
-# Utils
+# Pydantic v2 + Settings + EmailStr
 pydantic==2.9.2
-python-dotenv==1.0.1     # load .env
-pydantic-settings
-email-validator
+pydantic-settings==2.4.0
+email-validator==2.2.0
+
+# Auth / Security
+python-jose==3.3.0
+passlib[bcrypt]==1.7.4
+
+# PostgreSQL driver (v3, tương thích Python 3.13)
+psycopg[binary]==3.2.1
+
+# .env loader cho pydantic-settings
+python-dotenv==1.0.1
