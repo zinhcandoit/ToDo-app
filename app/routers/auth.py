@@ -39,14 +39,14 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
     user = None
     if payload.email:
         user = db.query(User).filter(User.email == payload.email).first()
-    elif payload.username:
-        # nếu muốn cho phép login bằng "username" thì coi "username" là name
-        user = db.query(User).filter(User.name == payload.username).first()
 
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    token = create_access_token(data={"sub": str(user.id)})
+    token = create_access_token(
+        data={"sub": user.email},
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -59,5 +59,4 @@ def forgot(body: dict):
 
 @router.post("/google/start")
 def google_start():
-    # stub, tồn tại để FE không gặp 404; sẽ trả 501
     raise HTTPException(status_code=501, detail="Google OAuth not configured")
