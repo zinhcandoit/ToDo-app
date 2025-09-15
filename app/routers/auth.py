@@ -7,7 +7,7 @@ from app.schemas.auth import UserSignup, UserLogin, Token
 from app.auth import get_password_hash, verify_password, create_access_token
 from app.config import settings
 
-router = APIRouter(tags=["Auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/signup", response_model=Token)
 def signup(payload: UserSignup, db: Session = Depends(get_db)):
